@@ -22,7 +22,19 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Classifiers\kNN.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Classifiers\NaiveBayes.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Classifiers\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="hearthstone_deck_classifier.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Classifiers\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
