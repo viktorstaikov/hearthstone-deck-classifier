@@ -51,18 +51,16 @@
             self.all_cards[card_name] = 0.0
 
         self.all_cards[card_name] += count
+
+        if not archetype in self.archetypes:
+            self.archetypes.append(archetype)
         
         if not (hero_class in self.cards):
             self.cards[hero_class] = {}
             self.cards[hero_class]["total"] = 0.0
-            
-            #self.classes.append(hero_class)
-
         if not (archetype in self.cards[hero_class]):
             self.cards[hero_class][archetype] = {}
             self.cards[hero_class][archetype]["total"] = 0.0
-            self.archetypes.append(archetype)
-
         if not (card_name in self.cards[hero_class][archetype]):
             self.cards[hero_class][archetype][card_name] = 0.0
 
@@ -75,12 +73,16 @@
             self.AddCard(card)
 
     def Classify(self, hero_class, deck):
-        max_prob = 0.0
-        most_prob = "unknown"
+        type_probability = {}
+        total_prob = 0
         for archetype in self.archetypes:
             prob = self.__CalculateProbability(hero_class, archetype, deck)
-            if prob > max_prob:
-                max_prob = prob
-                most_prob = archetype
+            type_probability[archetype] = prob
+            total_prob += prob
+
+        # normalize the probabilities
+        for archetype in type_probability:
+            type_probability[archetype] /= total_prob
+
         
-        return most_prob
+        return type_probability

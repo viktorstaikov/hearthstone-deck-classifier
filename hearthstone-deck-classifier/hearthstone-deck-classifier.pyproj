@@ -37,7 +37,12 @@
     <Folder Include="Classifiers\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="test.csv" />
+    <Content Include="test4.csv" />
+    <Content Include="test6.csv" />
+    <Content Include="test5.csv" />
+    <Content Include="test3.csv" />
+    <Content Include="test2.csv" />
+    <Content Include="test1.csv" />
     <Content Include="hearthstonedecks.csv" />
   </ItemGroup>
   <PropertyGroup>

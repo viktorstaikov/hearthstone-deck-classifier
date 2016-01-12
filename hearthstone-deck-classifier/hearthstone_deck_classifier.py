@@ -4,7 +4,7 @@ import csv
 decks_file = "hearthstonedecks.csv"
 raw_data = []
 
-test_filte = "test.csv"
+test_filte = "test6.csv"
 test_data = []
 
 def LoadDataset(filename, data=[], keys=[]):
@@ -27,7 +27,7 @@ def main():
 
     expected = naive_bayes.Classify(test_data[0]["class"], test_data)
 
-    print(expected)
+    print(repr(expected))
     print(test_data[0]["archetype"])
 
     print('Hello World')
