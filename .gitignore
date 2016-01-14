@@ -295,3 +295,6 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+# Vim swap files
+**/.*.swp
