@@ -9,7 +9,7 @@
         self.classes = []
         self.archetypes = []
 
-    def __CalculateProbability(self, hero_class, archetype, deck):
+    def __calculate_probability(self, hero_class, archetype, deck):
 
         if not archetype in self.cards[hero_class]:
             return 0
@@ -38,7 +38,7 @@
 
         return probability
 
-    def AddCard(self, card):
+    def add_card(self, card):
         self.total_cards += 1
         self.raw_data.append(card)
 
@@ -68,11 +68,11 @@
         self.cards[hero_class][archetype]["total"] += count
         self.cards[hero_class][archetype][card_name] += count
 
-    def ProcessData(self, raw_data):
+    def process_data(self, raw_data):
         for card in raw_data:
             self.AddCard(card)
 
-    def Classify(self, hero_class, deck):
+    def classify(self, hero_class, deck):
         type_probability = {}
         total_prob = 0
         for archetype in self.archetypes:
