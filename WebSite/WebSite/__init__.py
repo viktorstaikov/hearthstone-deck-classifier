@@ -23,6 +23,8 @@ if Card.table_exists() == False:
 k_neighbours = Classifiers.KNearestNeighbours()
 naive_bayes = Classifiers.NaiveBayes()
 
+cards = Card.select().execute()
+naive_bayes.process_data(cards)
 
 
 import WebSite.api

@@ -5,8 +5,6 @@ API Endpoints to be used in the UI.
 from WebSite import app, naive_bayes, k_neighbours
 from flask import make_response, request
 
-from flask_peewee.rest import RestAPI, Authentication, UserAuthentication, RestResource
-from peewee import Model
 from models import Card
 from WebSite import app, db
 from datetime import datetime
@@ -35,26 +33,36 @@ def bootstrap():
     load_dataset(decks_file, raw_data)
     print("Raw_data: " + repr(len(raw_data)))
     
-    #for data_dict in raw_data:
-    #    Card.create(**data_dict)
     with db.database.atomic():
         step = 5000
         for idx in range(0, len(raw_data), step):
             Card.insert_many(raw_data[idx:idx + step]).execute()
             print("Inserted: " + repr(idx))
-        #Card.insert_many(raw_data).execute()
 
-    naive_bayes.process_data(raw_data)
+    cards = Card.select().execute()
+    naive_bayes.process_data(cards)
     return make_response("Success")
     
 
 @app.route('/api/cards/count', methods=['GET'])
-def cardsCount():
+def cards_count():
     count = Card.select().count()
     return make_response(str(count))
 
 
-@app.route('/api/deck/', methods=['POST'])
-def analyseDeck():
-    deck = request.get_json()
-    pass
+@app.route('/api/deck/classify', methods=['POST'])
+def deck_classify():
+    data = request.get_json()
+    hero_class = str(data["hero_class"])
+    deck = data["deck"]
+
+    result = naive_bayes.classify(hero_class, deck)
+    print(repr(hero_class))
+    print(repr(deck))
+    print(repr(result))
+    return make_response(json.dumps(result))
+
+@app.route('/api/deck/add', methods=['POST'])
+def deck_add():
+    data = request.get_json()
+    return make_response(data)

@@ -42,10 +42,10 @@
         self.total_cards += 1
         self.raw_data.append(card)
 
-        hero_class = card["hero_class"]
-        archetype = card["archetype"]
-        card_name = card["card_name"]
-        count = int(card["card_count"])
+        hero_class = card.hero_class
+        archetype = card.archetype
+        card_name = card.card_name
+        count = card.card_count
 
         if not (card_name in self.all_cards):
             self.all_cards[card_name] = 0.0
@@ -77,6 +77,7 @@
         total_prob = 0
         for archetype in self.archetypes:
             prob = self.__calculate_probability(hero_class, archetype, deck)
+            print("    the prob is " + repr(prob))
             type_probability[archetype] = prob
             total_prob += prob
 
