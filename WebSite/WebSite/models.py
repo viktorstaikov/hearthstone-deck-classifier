@@ -8,14 +8,15 @@ from WebSite import db
 class Card(db.Model):
     
     # custom fields
-    title = CharField(unique=True, null=False)
-    card_name = CharField(unique=True, null=False)
+    title = CharField(null=False)
+    card_name = CharField(null=False)
     card_count = IntegerField()
-    hero_class = CharField(unique=True, null=False)
-    archetype = CharField(unique=True, null=False)
-    season = CharField(unique=True, null=False)
-    game_mode = CharField(unique=True, null=False)
+    hero_class = CharField(null=False)
+    archetype = CharField(null=False)
+    season = CharField(null=False)
+    game_mode = CharField(null=False)
 
     def to_JSON(self):
         d = self.__dict__['_data']
         return json.dumps(d)
+

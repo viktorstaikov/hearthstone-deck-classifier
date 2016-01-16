@@ -47,6 +47,7 @@
     <Folder Include="WebSite\templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="decks.db" />
     <Content Include="requirements.txt" />
     <Content Include="WebSite\hearthstonedecks.csv" />
     <Content Include="WebSite\schema.sql" />
@@ -72,10 +73,7 @@
     <Content Include="WebSite\static\scripts\respond.js" />
     <Content Include="WebSite\static\scripts\respond.min.js" />
     <Content Include="WebSite\static\scripts\_references.js" />
-    <Content Include="WebSite\templates\about.jade" />
-    <Content Include="WebSite\templates\contact.jade" />
     <Content Include="WebSite\templates\index.html" />
-    <Content Include="WebSite\templates\layout.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 
