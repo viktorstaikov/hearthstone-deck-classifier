@@ -2,12 +2,12 @@
 API Endpoints to be used in the UI.
 """
 
-from FlaskWebProject1 import app, naive_bayes, k_neighbours
+from WebSite import app, naive_bayes, k_neighbours
 from flask import make_response, request
 
 from flask_peewee.rest import RestAPI, Authentication, UserAuthentication, RestResource
 from models import Card
-from FlaskWebProject1 import app, db
+from WebSite import app, db
 from datetime import datetime
 import json
 

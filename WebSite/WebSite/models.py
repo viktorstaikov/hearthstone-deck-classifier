@@ -2,7 +2,7 @@
 from peewee import *
 from datetime import datetime
 import json
-from FlaskWebProject1 import db
+from WebSite import db
 
 
 class Card(db.Model):

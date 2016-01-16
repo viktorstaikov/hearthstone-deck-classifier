@@ -23,9 +23,9 @@ def main():
     LoadDataset(test_filte, test_data)
     
     naive_bayes = Classifiers.NaiveBayes()
-    naive_bayes.ProcessData(raw_data)
+    naive_bayes.process_data(raw_data)
 
-    expected = naive_bayes.Classify(test_data[0]["class"], test_data)
+    expected = naive_bayes.classify(test_data[0]["class"], test_data)
 
     print(repr(expected))
     print(test_data[0]["archetype"])

@@ -9,8 +9,7 @@ import Classifiers
 
 
 app = Flask(__name__)
-app.config.from_object('FlaskWebProject1.config')
-app.jinja_env.add_extension('pyjade.ext.jinja.PyJadeExtension')
+app.config.from_object('WebSite.config')
 
 
 # instantiate the db wrapper
@@ -26,6 +25,6 @@ naive_bayes = Classifiers.NaiveBayes()
 
 
 
-import FlaskWebProject1.api
-import FlaskWebProject1.views
+import WebSite.api
+import WebSite.views
 
