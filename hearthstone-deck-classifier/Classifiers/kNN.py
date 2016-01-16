@@ -1,40 +1,36 @@
 ﻿from heapq import heappush
 
-class KNearestNeighbours(object):
-    """description of class"""
+class KNearestDecks(object):
+    """ Finds the decks that are most similar to a set of cards. """
+
+    MAX_CARDS_IN_DECK = 30
+
     def __init__(self):
         self.decks = {}
 
-    def add_card(self, deck_card):
-        deck_archetype_id = KNearestNeighbours.__get_deck_archetype_id(
-                deck_card['class'], deck_card['archetype'])
-        if deck_archetype_id not in self.decks:
-            self.decks[deck_archetype_id] = {}
+    def update_deck(self, deck_entry):
+        """ Adds a card to its corresponding deck. """
+        archetype = deck_entry['class'] + '##' + deck_entry['archetype']
+        if archetype not in self.decks:
+            self.decks[archetype] = {}
 
-        deck_title = deck_card['title']
-        if deck_title not in self.decks[deck_archetype_id]:
-            self.decks[deck_archetype_id][deck_title] = set()
+        title = deck_entry['title']
+        if title not in self.decks[archetype]:
+            self.decks[archetype][title] = set()
 
-        self.decks[deck_archetype_id][deck_title].add(deck_card['card-name'])
+        self.decks[archetype][title].add(deck_entry['card-name'])
 
-    def get_nearest(self, k, hero_class, deck_archetype, deck_cards):
-        distSortedDecks = []
-        deck_archetype_id = KNearestNeighbours.__get_deck_archetype_id(hero_class, deck_archetype)
+    def get_nearest_decks(self, k, hero_class, archetype, cards):
+        """ Finds the k decks that are closest to the passed set of cards. """
+        dist_sorted_decks = []
+        archetype_id = hero_class + '##' + archetype
 
-        for deck_title, cards in self.decks[deck_archetype_id].iteritems():
-            dist = KNearestNeighbours.__get_distance(deck_cards, cards)
-            heappush(distSortedDecks, (dist, deck_title))
+        for deck_title, arch_cards in self.decks[archetype_id].iteritems():
+            dist = KNearestDecks.__get_distance(arch_cards, cards)
+            heappush(dist_sorted_decks, (dist, deck_title))
 
-        print distSortedDecks
+        return dist_sorted_decks[:k]
 
-    @staticmethod
-    def __get_distance(first, second):
-        dist = 30
-        diff = first - second
-        return len(diff)
-
-    @staticmethod
-    def __get_deck_archetype_id(hero_class, deck_archetype):
-        return '%s##%s' % (hero_class, deck_archetype)
-
-
+    @classmethod
+    def __get_distance(cls, first, second):
+        return cls.MAX_CARDS_IN_DECK - len(first - second)
