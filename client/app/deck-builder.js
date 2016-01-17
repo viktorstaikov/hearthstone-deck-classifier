@@ -1,8 +1,17 @@
 var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', 'chart.js'])
   .controller('DeckController', ['$scope', '$http', function($scope, $http) {
-
     // Classification
     var classifyApiBaseUrl = 'https://viktorstaikov.pythonanywhere.com/api';
+    $scope.archetypeNames = [];
+    $scope.archetypePercent = [];
+
+    var initChart = function(archetypes) {
+      var archetypeNames = Object.keys(archetypes);
+      $scope.archetypeNames = archetypeNames;
+      for (i in archetypeNames) {
+        $scope.archetypePercent.push(archetypes[archetypeNames[i]]);
+      }
+    };
 
     var updateClassifier = function() {
       $http({
@@ -13,9 +22,13 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
           deck: $scope.deck
         }
       }).then(function success(response) {
-        console.log(response);
+        initChart(response.data['archetypes'])
       });
     };
+
+    // Chart
+    $scope.labels = ["Download Sales", "In-Store Sales", "Mail-Order Sales"];
+    $scope.data = [300, 500, 100];
 
     // Utility
    var getCardIndex = function(cardName) {

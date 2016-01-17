@@ -25,85 +25,121 @@
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Style -->
+    <link rel="stylesheet" href="style.css">
   </head>
   <body ng-app="deck-builder">
-  <div class="container">
-    <div class="page-header">
-      <h1>Hearthstone Deck Classifier</h1>
-    </div>
-
-    <div ng-controller="DeckController">
-      <div class="row">
-        <div class="form-group col-md-8">
-          <md-autocomplete 
-            placeholder="Select a card to add to the deck."
-            md-selected-item="selectedCard" 
-            md-search-text="searchCardText" 
-            md-items="item in getCardSuggestions()" 
-            md-item-text="item.display" 
-            md-min-length="3"
-            md-selected-item-change="addToDeck()">
-       
-            <md-item-template>
-              <span md-highlight-text="searchCardText">{{item.display}}</span>
-            </md-item-template>
-            <md-not-found>
-              No cards found.
-            </md-not-found>
-       
-          </md-autocomplete>
-        </div>
-  
-        <div class="form-group col-md-4">
-          <md-autocomplete 
-            placeholder="Select hero class."
-            md-selected-item="heroClass" 
-            md-search-text="searchHeroClassText" 
-            md-items="item in getHeroClassSuggestions()" 
-            md-item-text="item.display" 
-            md-selected-item-change="selectHeroClass()">
-       
-            <md-item-template>
-              <span md-highlight-text="searchHeroClassText">{{item.display}}</span>
-            </md-item-template>
-            <md-not-found>
-              No classes match.
-            </md-not-found>
-       
-          </md-autocomplete>
-        </div>
+    <div class="container">
+      <div class="page-header">
+        <h1>Hearthstone Deck Classifier</h1>
       </div>
 
-			
-      <br/>
-      <h2>Deck cards</h2>
-			<table st-table="displayedDeck" st-safe-src="deck" class="table table-striped">
-				<thead>
-				<tr ng-if="displayedDeck.length != 0">
-					<th>Card name</th>
-					<th>Count</th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr ng-repeat="card in deck">
-					<td>{{card['card_name']}}</td>
-					<td>{{card['card_count']}}</td>
-          <td>
-            <img ng-src="{{card['img']}}" alt="Card image" height="130" width="90">
-          </td>
-					<td>
-    				<button type="button" ng-click="removeFromDeck(card)" class="btn btn-sm btn-danger">
-	    				<i class="glyphicon glyphicon-remove-circle"></i>
-    		  	</button>
-	  			</td>
-				</tr>
-				</tbody>
-			</table>
+      <div ng-controller="DeckController">
+        <div class="row">
+          <div class="form-group col-md-8">
+            <md-autocomplete 
+              placeholder="Select a card to add to the deck."
+              md-selected-item="selectedCard" 
+              md-search-text="searchCardText" 
+              md-items="item in getCardSuggestions()" 
+              md-item-text="item.display" 
+              md-min-length="3"
+              md-selected-item-change="addToDeck()">
+         
+              <md-item-template>
+                <span md-highlight-text="searchCardText">{{item.display}}</span>
+              </md-item-template>
+              <md-not-found>
+                No cards found.
+              </md-not-found>
+         
+            </md-autocomplete>
+          </div>
+    
+          <div class="form-group col-md-4">
+            <md-autocomplete 
+              placeholder="Select hero class."
+              md-selected-item="heroClass" 
+              md-search-text="searchHeroClassText" 
+              md-items="item in getHeroClassSuggestions()" 
+              md-item-text="item.display" 
+              md-selected-item-change="selectHeroClass()">
+         
+              <md-item-template>
+                <span md-highlight-text="searchHeroClassText">{{item.display}}</span>
+              </md-item-template>
+              <md-not-found>
+                No classes match.
+              </md-not-found>
+         
+            </md-autocomplete>
+          </div>
+        </div>
 
-      <br/>
-      <h2>Classification</h2>
-      <p>No data here yet.</p>
+        <br/>
+        <h2>Deck cards</h2>
+        <table st-table="displayedDeck" st-safe-src="deck" class="table table-striped">
+          <thead>
+            <tr ng-if="displayedDeck.length != 0">
+              <th>Card name</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="card in deck">
+              <td>{{card['card_name']}}</td>
+              <td>{{card['card_count']}}</td>
+              <td>
+                <img ng-src="{{card['img']}}" alt="Card image" class="card-img">
+              </td>
+              <td>
+                <button type="button" ng-click="removeFromDeck(card)" class="btn btn-sm btn-danger">
+                  <i class="glyphicon glyphicon-remove-circle"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <br/>
+
+        <h2 ng-if="archetypeNames.length != 0">Classification</h2>
+        <br/>
+
+        <div class="row">
+          <div class="form-group col-md-8">
+            <table st-table="displayedDeck" st-safe-src="deck" class="table table-striped">
+              <thead>
+                <tr ng-if="displayedDeck.length != 0">
+                  <th>Card name</th>
+                  <th>Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="card in deck">
+                  <td>{{card['card_name']}}</td>
+                  <td>{{card['card_count']}}</td>
+                  <td>
+                    <img ng-src="{{card['img']}}" alt="Card image" class="card-img">
+                  </td>
+                  <td>
+                    <button type="button" ng-click="removeFromDeck(card)" class="btn btn-sm btn-danger">
+                      <i class="glyphicon glyphicon-remove-circle"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="form-group col-md-4">
+            <canvas id="pie" 
+              class="chart chart-pie" 
+              chart-data="archetypePercent" 
+              chart-labels="archetypeNames">
+            </canvas> 
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
   </body>
 </html>
