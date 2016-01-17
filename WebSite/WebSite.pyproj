@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebSite\" />
+    <Folder Include="WebSite\Classifiers\" />
     <Folder Include="WebSite\static\" />
     <Folder Include="WebSite\static\content\" />
     <Folder Include="WebSite\static\fonts\" />

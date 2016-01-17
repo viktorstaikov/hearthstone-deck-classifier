@@ -34,7 +34,7 @@ def bootstrap():
     print("Raw_data: " + repr(len(raw_data)))
     
     with db.database.atomic():
-        step = 5000
+        step = 100
         for idx in range(0, len(raw_data), step):
             Card.insert_many(raw_data[idx:idx + step]).execute()
             print("Inserted: " + repr(idx))
