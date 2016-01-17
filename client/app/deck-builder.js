@@ -138,6 +138,6 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
       updateClassifier();
     };
 
-    $scope.displayedRows = [];
+    $scope.displayedDeck = [];
     $scope.deck = [];
   }]);
