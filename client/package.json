@@ -12,7 +12,8 @@
   "license": "ISC",
   "dependencies" :
   { 
-    "express": "latest"
+    "express": "latest",
+    "angular-smart-table": "latest"
   },
   "devDependencies": {
     "lite-server": "^1.3.1"
