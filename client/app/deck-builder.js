@@ -1,25 +1,44 @@
 var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
   .controller('DeckController', ['$scope', '$http', function($scope, $http) {
-    $scope.getMatches = function() {
-      var url = 'https://omgvamp-hearthstone-v1.p.mashape.com/cards/search/'
-        + $scope.searchText;
 
+    var hearthstoneApiBaseUrl = 'https://omgvamp-hearthstone-v1.p.mashape.com';
+    var hearthstoneApiHeaders = {
+      'X-Mashape-Key': 'MQ5WRXL3ZEmshqn6OmLnz32G5ayop1KTodkjsnOUbuooXww9Uu'
+    };
+
+    var classifyApiBaseUrl = 'https://viktorstaikov.pythonanywhere.com/api';
+    var heroClasses = [
+      'Druid',
+      'Hunter',
+      'Mage',
+      'Paladin',
+      'Priest',
+      'Rogue',
+      'Shaman',
+      'Warlock',
+      'Warrior'
+    ];
+
+    var prepareSuggestions = function(data) {
+      displayData = [];
+      for (i in data) {
+        displayData.push({
+          display: data[i].name,
+          value: data[i].name
+        });
+      }
+
+      return displayData;
+    };
+
+    $scope.getCardSuggestions = function() {
       return $http({
         method: 'GET',
-        url: url,
-        headers: {
-          'X-Mashape-Key': 'MQ5WRXL3ZEmshqn6OmLnz32G5ayop1KTodkjsnOUbuooXww9Uu'
-        }}).then(function success(response) {
-          console.log(response);
-          displayData = [];
-          for (i in response.data) {
-            displayData.push({
-              display: response.data[i].name,
-              value: response.data[i].name
-            });
-          }
-          return displayData;
-        });
+        url: hearthstoneApiBaseUrl + '/cards/search/' + $scope.searchCardText,
+        headers: hearthstoneApiHeaders
+      }).then(function success(response) {
+          return prepareSuggestions(response.data);
+      });
     };
 
     var getCardIndex = function(cardName) {
@@ -33,29 +52,37 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
     };
 
     var updateClassifier = function() {
-      var data = {
-        hero_class: $scope.heroClass,
-        deck: $scope.deck
-      };
-      var url = 'https://viktorstaikov.pythonanywhere.com/api/deck/classify';
       $http({
         method: 'POST',
-        url: url,
-        data: data
+        url: classifyApiBaseUrl + '/deck/classify',
+        data: {
+          hero_class: $scope.heroClass,
+          deck: $scope.deck
+        }
       }).then(function success(response) {
         console.log(response);
       });
     };
 
     var loadImage = function(card) {
+      $http({
+        method: 'GET',
+        url: hearthstoneApiBaseUrl + '/cards/' + card,
+        headers: hearthstoneApiHeaders
+      }).then(function success(response) {
+        var cardIndex = getCardIndex(card);
+        if (cardIndex != -1) {
+          $scope.deck[cardIndex]['img'] = response.data[0]['img'];
+        }
+      });
     };
 
     $scope.addToDeck = function() {
-      if (!$scope.selectedItem) {
+      if (!$scope.selectedCard) {
         return;
       }
 
-      var card =  $scope.selectedItem.value
+      var card =  $scope.selectedCard.value
       var cardIndex = getCardIndex(card);
 
       if (cardIndex !== -1) {
@@ -70,7 +97,7 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
         loadImage(card);
       }
 
-      $scope.searchText = '';
+      $scope.searchCardText = '';
       updateClassifier();
     };
 
@@ -88,7 +115,22 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
       updateClassifier();
     };
 
+    $scope.getHeroClassSuggestions = function () {
+      var prefix = $scope.searchHeroClassText.toLowerCase();
+      var suggestions = [];
+      for (i in heroClasses) {
+        if (heroClasses[i].toLowerCase().startsWith(prefix)) {
+          suggestions.push({
+            display: heroClasses[i],
+            value: heroClasses[i]
+          });
+        }
+      }
+
+      return suggestions;
+    };
+
     $scope.displayedRows = [];
     $scope.deck = [];
-    $scope.heroClass = 'Rogue';
+    $scope.heroClass = '';
   }]);
