@@ -74,7 +74,7 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
 
       displayData = [];
       for (i in data) {
-        if (data[i].playerClass == $scope.heroClass || !data[i].playerClass) {
+        if (data[i].playerClass == $scope.heroClass.value || !data[i].playerClass) {
           displayData.push({
             display: data[i].name,
             value: data[i].name
