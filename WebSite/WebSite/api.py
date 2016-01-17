@@ -3,12 +3,13 @@ API Endpoints to be used in the UI.
 """
 
 from WebSite import app, naive_bayes, k_neighbours
-from flask import make_response, request
+from flask import make_response, request, current_app
 from flask.ext.cors import CORS, cross_origin
+from functools import update_wrapper
 
 from models import Card
 from WebSite import app, db
-from datetime import datetime
+from datetime import datetime, timedelta
 from heapq import heappush
 
 import json
@@ -59,7 +60,7 @@ def cards_count():
 @app.route('/api/deck/classify', methods=['POST'])
 def deck_classify():
     data = request.get_json()
-    hero_class = str(data["hero_class"])
+    hero_class = data["hero_class"]
     deck = data["deck"]
 
     archetypes = naive_bayes.classify(hero_class, deck)
