@@ -4,18 +4,22 @@ API Endpoints to be used in the UI.
 
 from WebSite import app, naive_bayes, k_neighbours
 from flask import make_response, request
+from flask.ext.cors import CORS, cross_origin
 
 from models import Card
 from WebSite import app, db
 from datetime import datetime
+from heapq import heappush
+
 import json
 import csv
 
+CORS(app)
 
 @app.route('/api/bootstrap', methods=['POST', 'GET'])
 def bootstrap():
     Card.delete().execute()
-    
+
     def load_dataset(filename, data=[], keys=[]):
         with open(filename, 'rb') as csvfile:
             lines = csv.reader(csvfile)
@@ -40,8 +44,9 @@ def bootstrap():
             print("Inserted: " + repr(idx))
 
     cards = Card.select().execute()
-    naive_bayes.process_data(cards)
-    k_neighbours.process_data(cards)
+    for card in raw_data:
+        naive_bayes.add_card(card)
+        k_neighbours.update_deck(card)
     return make_response("Success")
     
 
@@ -58,18 +63,72 @@ def deck_classify():
     deck = data["deck"]
 
     archetypes = naive_bayes.classify(hero_class, deck)
-    most_probable = "none"
-    max_prob = 0.0
+    print(repr(archetypes))
+    sorted_archetypes = []
     for key in archetypes:
-        if max_prob < archetypes[key]:
-            max_prob = archetypes[key]
-            most_probable = key
+        heappush(sorted_archetypes, ( 0 - archetypes[key], key))
 
-    nearest = k_neighbours.get_nearest_decks(3, hero_class, [most_probable], deck)
-    return make_response(json.dumps({"archetypes": most_probable, "nearest": nearest}))
-    #return make_response(json.dumps({"archetypes": archetypes}))
+    treshold, sum = 0.5, 0
+    top_archetypes = []
+    for prob, archetype in sorted_archetypes:
+        if sum < treshold:
+            sum+= (0-prob)
+            top_archetypes.append(archetype)
+            
+    nearest = k_neighbours.get_nearest_decks(3, hero_class, top_archetypes, deck)
 
-@app.route('/api/deck/add', methods=['POST'])
-def deck_add():
-    data = request.get_json()
-    return make_response(data)
+    has_match = False
+    for dist, near_entry in nearest:
+        has_match |= near_entry['complete_match']
+        if near_entry['complete_match'] and number_of_cards(near_entry["deck"]) < number_of_cards(deck):
+            update_old_deck(near_entry["deck"], deck)
+
+    if not has_match and number_of_cards(deck) > 10:
+        inser_new_deck(hero_class, top_archetypes[0], deck)
+        pass
+
+    return make_response(json.dumps({
+        "archetypes": archetypes,
+        "nearest": nearest,
+        "has_match": has_match
+        }))
+
+def number_of_cards(deck):
+    """The number of cards in a deck."""
+    count = 0
+    for card in deck:
+        print(repr(card))
+        card_count = int(card['card_count'])
+        count += card_count
+    return count
+
+def update_old_deck(old_deck, new_deck):
+    """When the old deck has fewer cards that the new one, inserts the missing entries"""
+    for new_card in new_deck:
+        found = False
+        for old_card in old_deck:
+            if new_card['card_name'] == old_card['card_name']:
+                found = True
+                if new_card['card_count'] > old_card['card_count']:
+                    add_card_entry(old_card)
+        if not found:
+            new_card["title"] = old_card["title"]
+            new_card["hero_class"] = old_card["hero_class"]
+            new_card["archetype"] = old_card["archetype"]
+            add_card_entry(card)
+
+
+def inser_new_deck(hero_class, archetype, deck):
+    """Inserts a new deck card by card"""
+    title = "Deck from " + datetime.now().isoformat()
+    for card in deck:
+        card["title"] = title
+        card["hero_class"] = hero_class
+        card["archetype"] = archetype
+        add_card_entry(card)
+
+def add_card_entry(card):
+    #card["card_count"] = int(card["card_count"])
+    naive_bayes.add_card(card)
+    k_neighbours.update_deck(card)
+    Card.insert_many([card]).execute()

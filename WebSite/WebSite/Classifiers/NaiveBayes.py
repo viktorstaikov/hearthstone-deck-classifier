@@ -46,7 +46,7 @@
         hero_class = card['hero_class']
         archetype = card['archetype']
         card_name = card['card_name']
-        count = card['card_count']
+        count = int(card['card_count'])
 
         if not (card_name in self.all_cards):
             self.all_cards[card_name] = 0.0

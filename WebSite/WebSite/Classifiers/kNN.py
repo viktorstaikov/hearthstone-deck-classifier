@@ -33,6 +33,8 @@ class KNearestDecks(object):
 
         for archetype in archetypes:
             archetype_id = hero_class + '##' + archetype
+            if not archetype_id in self.decks:
+                continue
             for deck_title, deck in self.decks[archetype_id].iteritems():
                 deck_id = archetype_id + '##' + deck_title
                 dist = self.__get_distance(deck_id, cards)

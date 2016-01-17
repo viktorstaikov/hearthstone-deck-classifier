@@ -10,11 +10,12 @@ class Card(db.Model):
     # custom fields
     title = CharField(null=False)
     card_name = CharField(null=False)
+
     card_count = IntegerField()
     hero_class = CharField(null=False)
     archetype = CharField(null=False)
-    season = CharField(null=False)
-    game_mode = CharField(null=False)
+    season = CharField(null=True)
+    game_mode = CharField(null=True)
 
     def to_JSON(self):
         d = self.__dict__['_data']
