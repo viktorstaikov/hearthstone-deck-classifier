@@ -1,0 +1,29 @@
+{
+  "name": "hearthstone-deck-classifier",
+  "homepage": "https://github.com/viktorstaikov/hearthstone-deck-classifier",
+  "authors": [
+    "delyand <delqn.dimitrov@gmail.com>"
+  ],
+  "description": "A simple hearthstone deck classifier.",
+  "main": "index.html",
+  "moduleType": [],
+  "keywords": [
+    "hearthstone",
+    "cassifier",
+    "deck"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-smart-table": "~2.1.6",
+    "angular-chart.js": "~0.8.8",
+    "Chart.js": "~1.0.2"
+  }
+}

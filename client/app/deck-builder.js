@@ -1,4 +1,4 @@
-var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
+var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', 'chart.js'])
   .controller('DeckController', ['$scope', '$http', function($scope, $http) {
 
     // Classification
@@ -9,7 +9,7 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
         method: 'POST',
         url: classifyApiBaseUrl + '/deck/classify',
         data: {
-          hero_class: $scope.heroClass,
+          hero_class: $scope.heroClass.value,
           deck: $scope.deck
         }
       }).then(function success(response) {
@@ -20,7 +20,7 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
     // Utility
    var getCardIndex = function(cardName) {
       for (i in $scope.deck) {
-        if ($scope.deck[i]['card-name'] === cardName) {
+        if ($scope.deck[i]['card_name'] === cardName) {
           return i;
         }
       }
@@ -109,11 +109,11 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
       var cardIndex = getCardIndex(card);
 
       if (cardIndex !== -1) {
-        $scope.deck[cardIndex]['card-count'] += 1;
+        $scope.deck[cardIndex]['card_count'] += 1;
       } else {
         $scope.deck.push({
-          'card-name': card,
-          'card-count': 1,
+          'card_name': card,
+          'card_count': 1,
           'img': 'card-back-default.png'
         });
 
@@ -125,13 +125,13 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
     };
 
     $scope.removeFromDeck = function(card) {
-      cardIndex = getCardIndex(card['card-name']);
+      cardIndex = getCardIndex(card['card_name']);
       if (cardIndex === -1) {
         return;
       }
 
-      $scope.deck[cardIndex]['card-count']--;
-      if ($scope.deck[cardIndex]['card-count'] <= 0) {
+      $scope.deck[cardIndex]['card_count']--;
+      if ($scope.deck[cardIndex]['card_count'] <= 0) {
         $scope.deck.splice(cardIndex, 1);
       }
 

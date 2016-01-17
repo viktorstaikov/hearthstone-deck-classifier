@@ -13,10 +13,15 @@
     <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
 
     <!-- Table view -->
-    <script type="text/javascript" src="node_modules/angular-smart-table/dist/smart-table.js"></script>
+    <script type="text/javascript" src="bower_components/angular-smart-table/dist/smart-table.js"></script>
 
     <!-- Angular controllers -->
     <script type="text/javascript" src="app/deck-builder.js"></script>
+
+    <!-- Charts -->
+    <script type="text/javascript" src="bower_components/Chart.js/Chart.js"></script>
+    <script type="text/javascript" src="bower_components/angular-chart.js/dist/angular-chart.js"></script>
+    <link rel="stylesheet" href="bower_components/angular-chart.js/dist/angular-chart.css">
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -81,8 +86,8 @@
 				</thead>
 				<tbody>
 				<tr ng-repeat="card in deck">
-					<td>{{card['card-name']}}</td>
-					<td>{{card['card-count']}}</td>
+					<td>{{card['card_name']}}</td>
+					<td>{{card['card_count']}}</td>
           <td>
             <img ng-src="{{card['img']}}" alt="Card image" height="130" width="90">
           </td>
