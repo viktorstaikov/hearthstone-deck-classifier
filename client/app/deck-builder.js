@@ -1,55 +1,8 @@
 var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
   .controller('DeckController', ['$scope', '$http', function($scope, $http) {
 
-    var hearthstoneApiBaseUrl = 'https://omgvamp-hearthstone-v1.p.mashape.com';
-    var hearthstoneApiHeaders = {
-      'X-Mashape-Key': 'MQ5WRXL3ZEmshqn6OmLnz32G5ayop1KTodkjsnOUbuooXww9Uu'
-    };
-
+    // Classification
     var classifyApiBaseUrl = 'https://viktorstaikov.pythonanywhere.com/api';
-    var heroClasses = [
-      'Druid',
-      'Hunter',
-      'Mage',
-      'Paladin',
-      'Priest',
-      'Rogue',
-      'Shaman',
-      'Warlock',
-      'Warrior'
-    ];
-
-    var prepareSuggestions = function(data) {
-      displayData = [];
-      for (i in data) {
-        displayData.push({
-          display: data[i].name,
-          value: data[i].name
-        });
-      }
-
-      return displayData;
-    };
-
-    $scope.getCardSuggestions = function() {
-      return $http({
-        method: 'GET',
-        url: hearthstoneApiBaseUrl + '/cards/search/' + $scope.searchCardText,
-        headers: hearthstoneApiHeaders
-      }).then(function success(response) {
-          return prepareSuggestions(response.data);
-      });
-    };
-
-    var getCardIndex = function(cardName) {
-      for (i in $scope.deck) {
-        if ($scope.deck[i]['card-name'] === cardName) {
-          return i;
-        }
-      }
-
-      return -1;
-    };
 
     var updateClassifier = function() {
       $http({
@@ -64,6 +17,76 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
       });
     };
 
+    // Utility
+   var getCardIndex = function(cardName) {
+      for (i in $scope.deck) {
+        if ($scope.deck[i]['card-name'] === cardName) {
+          return i;
+        }
+      }
+
+      return -1;
+    };
+
+    // Autocomplete add card
+    var hearthstoneApiBaseUrl = 'https://omgvamp-hearthstone-v1.p.mashape.com';
+    var hearthstoneApiHeaders = {
+      'X-Mashape-Key': 'MQ5WRXL3ZEmshqn6OmLnz32G5ayop1KTodkjsnOUbuooXww9Uu'
+    };
+
+    var prepareSuggestions = function(data) {
+      displayData = [];
+      for (i in data) {
+        displayData.push({
+          display: data[i].name,
+          value: data[i].name
+        });
+      }
+
+      return displayData;
+    };
+
+    // Autocomplete for hero class
+    var heroClasses = [
+      'Druid',
+      'Hunter',
+      'Mage',
+      'Paladin',
+      'Priest',
+      'Rogue',
+      'Shaman',
+      'Warlock',
+      'Warrior'
+    ];
+
+    $scope.getHeroClassSuggestions = function () {
+      var prefix = $scope.searchHeroClassText.toLowerCase();
+      var suggestions = [];
+      for (i in heroClasses) {
+        if (heroClasses[i].toLowerCase().startsWith(prefix)) {
+          suggestions.push({
+            display: heroClasses[i],
+            value: heroClasses[i]
+          });
+        }
+      }
+
+      return suggestions;
+    };
+
+    $scope.getCardSuggestions = function() {
+      return $http({
+        method: 'GET',
+        url: hearthstoneApiBaseUrl + '/cards/search/' + $scope.searchCardText,
+        headers: hearthstoneApiHeaders
+      }).then(function success(response) {
+          return prepareSuggestions(response.data);
+      });
+    };
+
+    $scope.heroClass = '';
+
+    // Deck view
     var loadImage = function(card) {
       $http({
         method: 'GET',
@@ -115,22 +138,6 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
       updateClassifier();
     };
 
-    $scope.getHeroClassSuggestions = function () {
-      var prefix = $scope.searchHeroClassText.toLowerCase();
-      var suggestions = [];
-      for (i in heroClasses) {
-        if (heroClasses[i].toLowerCase().startsWith(prefix)) {
-          suggestions.push({
-            display: heroClasses[i],
-            value: heroClasses[i]
-          });
-        }
-      }
-
-      return suggestions;
-    };
-
     $scope.displayedRows = [];
     $scope.deck = [];
-    $scope.heroClass = '';
   }]);
