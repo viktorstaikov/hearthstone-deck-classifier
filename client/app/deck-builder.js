@@ -1,17 +1,40 @@
 var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', 'chart.js'])
   .controller('DeckController', ['$scope', '$http', function($scope, $http) {
-    // Classification
-    var classifyApiBaseUrl = 'https://viktorstaikov.pythonanywhere.com/api';
+    // Chart
     $scope.archetypeNames = [];
     $scope.archetypePercent = [];
 
     var initChart = function(archetypes) {
       var archetypeNames = Object.keys(archetypes);
       $scope.archetypeNames = archetypeNames;
+
+      $scope.archetypePercent = [];
       for (i in archetypeNames) {
         $scope.archetypePercent.push(archetypes[archetypeNames[i]]);
       }
     };
+
+    // Decks table
+    $scope.displayedNearest = [];
+    $scope.nearest = [];
+
+    var initDecksTable = function(data) {
+      $scope.nearest = [];
+
+      for (i in data) {
+        var cards_match = 30 - data[i][0];
+        var deckData = data[i][1];
+
+        $scope.nearest.push({
+          archetype: deckData['archetype'],
+          cards_match: cards_match,
+          title: deckData['deck'][0]['title']
+        });
+      }
+    };
+
+    // Classification
+    var classifyApiBaseUrl = 'https://viktorstaikov.pythonanywhere.com/api';
 
     var updateClassifier = function() {
       $http({
@@ -22,13 +45,11 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
           deck: $scope.deck
         }
       }).then(function success(response) {
-        initChart(response.data['archetypes'])
+        console.log(response);
+        initChart(response.data['archetypes']);
+        initDecksTable(response.data['nearest']);
       });
     };
-
-    // Chart
-    $scope.labels = ["Download Sales", "In-Store Sales", "Mail-Order Sales"];
-    $scope.data = [300, 500, 100];
 
     // Utility
    var getCardIndex = function(cardName) {
