@@ -9,8 +9,8 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
         url: url,
         headers: {
           'X-Mashape-Key': 'MQ5WRXL3ZEmshqn6OmLnz32G5ayop1KTodkjsnOUbuooXww9Uu'
-        }})
-        .then(function success(response) {
+        }}).then(function success(response) {
+          console.log(response);
           displayData = [];
           for (i in response.data) {
             displayData.push({
@@ -33,7 +33,21 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
     };
 
     var updateClassifier = function() {
+      var data = {
+        hero_class: $scope.heroClass,
+        deck: $scope.deck
+      };
+      var url = 'https://viktorstaikov.pythonanywhere.com/api/deck/classify';
+      $http({
+        method: 'POST',
+        url: url,
+        data: data
+      }).then(function success(response) {
+        console.log(response);
+      });
+    };
 
+    var loadImage = function(card) {
     };
 
     $scope.addToDeck = function() {
@@ -43,15 +57,18 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
 
       var card =  $scope.selectedItem.value
       var cardIndex = getCardIndex(card);
+
       if (cardIndex !== -1) {
         $scope.deck[cardIndex]['card-count'] += 1;
-        return;
-      }
+      } else {
+        $scope.deck.push({
+          'card-name': card,
+          'card-count': 1,
+          'img': 'card-back-default.png'
+        });
 
-      $scope.deck.push({
-        'card-name': $scope.selectedItem.value,
-        'card-count': 1
-      });
+        loadImage(card);
+      }
 
       $scope.searchText = '';
       updateClassifier();
@@ -67,8 +84,11 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
       if ($scope.deck[cardIndex]['card-count'] <= 0) {
         $scope.deck.splice(cardIndex, 1);
       }
+
+      updateClassifier();
     };
 
     $scope.displayedRows = [];
     $scope.deck = [];
+    $scope.heroClass = 'Rogue';
   }]);
