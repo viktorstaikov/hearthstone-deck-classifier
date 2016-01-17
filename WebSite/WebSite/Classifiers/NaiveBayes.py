@@ -20,7 +20,8 @@
         probability *= self.cards[hero_class][archetype]["total"] / self.cards[hero_class]["total"]
 
         for card in deck:
-            card_name = card["card_name"]
+            card_name = card['card_name']
+            card_count = int(card['card_count'])
 
             if not card_name in self.cards[hero_class][archetype]:
                 return 0
@@ -33,7 +34,7 @@
             if card_type_prob == 0 or card_prob == 0:
                 return 0
 
-            probability *= (card_type_prob / card_prob)
+            probability *= (card_type_prob * card_count / card_prob)
                 
 
         return probability
@@ -42,10 +43,10 @@
         self.total_cards += 1
         self.raw_data.append(card)
 
-        hero_class = card.hero_class
-        archetype = card.archetype
-        card_name = card.card_name
-        count = card.card_count
+        hero_class = card['hero_class']
+        archetype = card['archetype']
+        card_name = card['card_name']
+        count = card['card_count']
 
         if not (card_name in self.all_cards):
             self.all_cards[card_name] = 0.0
@@ -77,13 +78,13 @@
         total_prob = 0
         for archetype in self.archetypes:
             prob = self.__calculate_probability(hero_class, archetype, deck)
-            print("    the prob is " + repr(prob))
             type_probability[archetype] = prob
             total_prob += prob
 
         # normalize the probabilities
-        for archetype in type_probability:
-            type_probability[archetype] /= total_prob
+        if total_prob != 0:
+            for archetype in type_probability:
+                type_probability[archetype] /= total_prob
 
         
         return type_probability

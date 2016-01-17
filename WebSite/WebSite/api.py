@@ -41,6 +41,7 @@ def bootstrap():
 
     cards = Card.select().execute()
     naive_bayes.process_data(cards)
+    k_neighbours.process_data(cards)
     return make_response("Success")
     
 
@@ -56,11 +57,17 @@ def deck_classify():
     hero_class = str(data["hero_class"])
     deck = data["deck"]
 
-    result = naive_bayes.classify(hero_class, deck)
-    print(repr(hero_class))
-    print(repr(deck))
-    print(repr(result))
-    return make_response(json.dumps(result))
+    archetypes = naive_bayes.classify(hero_class, deck)
+    most_probable = "none"
+    max_prob = 0.0
+    for key in archetypes:
+        if max_prob < archetypes[key]:
+            max_prob = archetypes[key]
+            most_probable = key
+
+    nearest = k_neighbours.get_nearest_decks(3, hero_class, [most_probable], deck)
+    return make_response(json.dumps({"archetypes": most_probable, "nearest": nearest}))
+    #return make_response(json.dumps({"archetypes": archetypes}))
 
 @app.route('/api/deck/add', methods=['POST'])
 def deck_add():

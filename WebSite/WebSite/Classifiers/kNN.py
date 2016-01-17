@@ -1,40 +1,67 @@
 ﻿from heapq import heappush
 
-class KNearestNeighbours(object):
-    """description of class"""
+class KNearestDecks(object):
+    """ Finds the decks that are most similar to a set of cards. """
+
+    MAX_CARDS_IN_DECK = 30
+
     def __init__(self):
         self.decks = {}
+        self.card_count = {}
 
-    def add_card(self, deck_card):
-        deck_archetype_id = KNearestNeighbours.__get_deck_archetype_id(
-                deck_card['class'], deck_card['archetype'])
-        if deck_archetype_id not in self.decks:
-            self.decks[deck_archetype_id] = {}
+    def update_deck(self, deck_entry):
+        """ Adds a card to its corresponding deck. """
+        archetype = deck_entry['hero_class'] + '##' + deck_entry['archetype']
+        if archetype not in self.decks:
+            self.decks[archetype] = {}
 
-        deck_title = deck_card['title']
-        if deck_title not in self.decks[deck_archetype_id]:
-            self.decks[deck_archetype_id][deck_title] = set()
+        title = deck_entry['title']
+        if title not in self.decks[archetype]:
+            self.decks[archetype][title] = []
 
-        self.decks[deck_archetype_id][deck_title].add(deck_card['card-name'])
+        self.decks[archetype][title].append(deck_entry)
 
-    def get_nearest(self, k, hero_class, deck_archetype, deck_cards):
-        distSortedDecks = []
-        deck_archetype_id = KNearestNeighbours.__get_deck_archetype_id(hero_class, deck_archetype)
+        card_name = deck_entry['card_name']
+        deck_entry_id = archetype + '##' + title + '##' + card_name
+        self.card_count[deck_entry_id] = int(deck_entry['card_count'])
 
-        for deck_title, cards in self.decks[deck_archetype_id].iteritems():
-            dist = KNearestNeighbours.__get_distance(deck_cards, cards)
-            heappush(distSortedDecks, (dist, deck_title))
 
-        print distSortedDecks
+    def get_nearest_decks(self, k, hero_class, archetypes, cards):
+        """ Finds the k decks that are closest to the passed set of cards. """
+        dist_sorted_decks = []
+        input_card_count = KNearestDecks.__get_count(cards)
+
+        for archetype in archetypes:
+            archetype_id = hero_class + '##' + archetype
+            for deck_title, deck in self.decks[archetype_id].iteritems():
+                deck_id = archetype_id + '##' + deck_title
+                dist = self.__get_distance(deck_id, cards)
+
+                is_complete_match = KNearestDecks.MAX_CARDS_IN_DECK - dist == input_card_count
+                heappush(dist_sorted_decks, (dist, {
+                    'deck': deck,
+                    'archetype': archetype,
+                    'complete_match': is_complete_match
+                }))
+
+        return dist_sorted_decks[:k]
+
+    def __get_distance(self, deck_id, cards):
+        dist = KNearestDecks.MAX_CARDS_IN_DECK
+
+        for card in cards:
+            card_name = card['card_name']
+            card_count = int(card['card_count'])
+            deck_entry_id = deck_id + '##' + card_name
+            if deck_entry_id in self.card_count:
+                count_in_deck = self.card_count[deck_entry_id]
+                dist -= min(count_in_deck, card_count)
+
+        return dist
 
     @staticmethod
-    def __get_distance(first, second):
-        dist = 30
-        diff = first - second
-        return len(diff)
-
-    @staticmethod
-    def __get_deck_archetype_id(hero_class, deck_archetype):
-        return '%s##%s' % (hero_class, deck_archetype)
-
-
+    def __get_count(cards):
+        count = 0
+        for card in cards:
+            count += int(card['card_count'])
+        return count

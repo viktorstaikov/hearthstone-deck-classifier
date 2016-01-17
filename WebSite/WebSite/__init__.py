@@ -20,11 +20,22 @@ from models import Card
 if Card.table_exists() == False:
     Card.create_table()
 
-k_neighbours = Classifiers.KNearestNeighbours()
+k_neighbours = Classifiers.KNearestDecks()
 naive_bayes = Classifiers.NaiveBayes()
 
 cards = Card.select().execute()
-naive_bayes.process_data(cards)
+for card in cards:
+    entry = {
+        "title": card.title,
+        "card_name": card.card_name,
+        "card_count": card.card_count,
+        "hero_class": card.hero_class,
+        "archetype": card.archetype,
+        "season": card.season,
+        "game_mode": card.game_mode 
+    }
+    naive_bayes.add_card(entry)
+    k_neighbours.update_deck(entry)
 
 
 import WebSite.api
