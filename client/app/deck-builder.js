@@ -45,7 +45,6 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
           deck: $scope.deck
         }
       }).then(function success(response) {
-        console.log(response);
         initChart(response.data['archetypes']);
         initDecksTable(response.data['nearest']);
       });
@@ -69,15 +68,31 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
     };
 
     var prepareSuggestions = function(data) {
+      if (!$scope.heroClass) {
+        return [];
+      }
+
       displayData = [];
       for (i in data) {
-        displayData.push({
-          display: data[i].name,
-          value: data[i].name
-        });
+        if (data[i].playerClass == $scope.heroClass || !data[i].playerClass) {
+          displayData.push({
+            display: data[i].name,
+            value: data[i].name
+          });
+        }
       }
 
       return displayData;
+    };
+
+    $scope.getCardSuggestions = function() {
+      return $http({
+        method: 'GET',
+        url: hearthstoneApiBaseUrl + '/cards/search/' + $scope.searchCardText,
+        headers: hearthstoneApiHeaders
+      }).then(function success(response) {
+        return prepareSuggestions(response.data);
+      });
     };
 
     // Autocomplete for hero class
@@ -107,18 +122,6 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
 
       return suggestions;
     };
-
-    $scope.getCardSuggestions = function() {
-      return $http({
-        method: 'GET',
-        url: hearthstoneApiBaseUrl + '/cards/search/' + $scope.searchCardText,
-        headers: hearthstoneApiHeaders
-      }).then(function success(response) {
-          return prepareSuggestions(response.data);
-      });
-    };
-
-    $scope.heroClass = '';
 
     // Deck view
     var loadImage = function(card) {
