@@ -1,30 +1,59 @@
-var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
+var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', 'chart.js'])
   .controller('DeckController', ['$scope', '$http', function($scope, $http) {
-    $scope.getMatches = function() {
-      var url = 'https://omgvamp-hearthstone-v1.p.mashape.com/cards/search/'
-        + $scope.searchText;
+    // Chart
+    $scope.archetypeNames = [];
+    $scope.archetypePercent = [];
 
-      return $http({
-        method: 'GET',
-        url: url,
-        headers: {
-          'X-Mashape-Key': 'MQ5WRXL3ZEmshqn6OmLnz32G5ayop1KTodkjsnOUbuooXww9Uu'
-        }}).then(function success(response) {
-          console.log(response);
-          displayData = [];
-          for (i in response.data) {
-            displayData.push({
-              display: response.data[i].name,
-              value: response.data[i].name
-            });
-          }
-          return displayData;
-        });
+    var initChart = function(archetypes) {
+      var archetypeNames = Object.keys(archetypes);
+      $scope.archetypeNames = archetypeNames;
+
+      $scope.archetypePercent = [];
+      for (i in archetypeNames) {
+        $scope.archetypePercent.push(archetypes[archetypeNames[i]]);
+      }
     };
 
-    var getCardIndex = function(cardName) {
+    // Decks table
+    $scope.displayedNearest = [];
+    $scope.nearest = [];
+
+    var initDecksTable = function(data) {
+      $scope.nearest = [];
+
+      for (i in data) {
+        var cards_match = 30 - data[i][0];
+        var deckData = data[i][1];
+
+        $scope.nearest.push({
+          archetype: deckData['archetype'],
+          cards_match: cards_match,
+          title: deckData['deck'][0]['title']
+        });
+      }
+    };
+
+    // Classification
+    var classifyApiBaseUrl = 'https://viktorstaikov.pythonanywhere.com/api';
+
+    var updateClassifier = function() {
+      $http({
+        method: 'POST',
+        url: classifyApiBaseUrl + '/deck/classify',
+        data: {
+          hero_class: $scope.heroClass.value,
+          deck: $scope.deck
+        }
+      }).then(function success(response) {
+        initChart(response.data['archetypes']);
+        initDecksTable(response.data['nearest']);
+      });
+    };
+
+    // Utility
+   var getCardIndex = function(cardName) {
       for (i in $scope.deck) {
-        if ($scope.deck[i]['card-name'] === cardName) {
+        if ($scope.deck[i]['card_name'] === cardName) {
           return i;
         }
       }
@@ -32,63 +61,120 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table'])
       return -1;
     };
 
-    var updateClassifier = function() {
-      var data = {
-        hero_class: $scope.heroClass,
-        deck: $scope.deck
-      };
-      var url = 'https://viktorstaikov.pythonanywhere.com/api/deck/classify';
-      $http({
-        method: 'POST',
-        url: url,
-        data: data
+    // Autocomplete add card
+    var hearthstoneApiBaseUrl = 'https://omgvamp-hearthstone-v1.p.mashape.com';
+    var hearthstoneApiHeaders = {
+      'X-Mashape-Key': 'MQ5WRXL3ZEmshqn6OmLnz32G5ayop1KTodkjsnOUbuooXww9Uu'
+    };
+
+    var prepareSuggestions = function(data) {
+      if (!$scope.heroClass) {
+        return [];
+      }
+
+      displayData = [];
+      for (i in data) {
+        if (data[i].playerClass == $scope.heroClass.value || !data[i].playerClass) {
+          displayData.push({
+            display: data[i].name,
+            value: data[i].name
+          });
+        }
+      }
+
+      return displayData;
+    };
+
+    $scope.getCardSuggestions = function() {
+      return $http({
+        method: 'GET',
+        url: hearthstoneApiBaseUrl + '/cards/search/' + $scope.searchCardText,
+        headers: hearthstoneApiHeaders
       }).then(function success(response) {
-        console.log(response);
+        return prepareSuggestions(response.data);
       });
     };
 
+    // Autocomplete for hero class
+    var heroClasses = [
+      'Druid',
+      'Hunter',
+      'Mage',
+      'Paladin',
+      'Priest',
+      'Rogue',
+      'Shaman',
+      'Warlock',
+      'Warrior'
+    ];
+
+    $scope.getHeroClassSuggestions = function () {
+      var prefix = $scope.searchHeroClassText.toLowerCase();
+      var suggestions = [];
+      for (i in heroClasses) {
+        if (heroClasses[i].toLowerCase().startsWith(prefix)) {
+          suggestions.push({
+            display: heroClasses[i],
+            value: heroClasses[i]
+          });
+        }
+      }
+
+      return suggestions;
+    };
+
+    // Deck view
     var loadImage = function(card) {
+      $http({
+        method: 'GET',
+        url: hearthstoneApiBaseUrl + '/cards/' + card,
+        headers: hearthstoneApiHeaders
+      }).then(function success(response) {
+        var cardIndex = getCardIndex(card);
+        if (cardIndex != -1) {
+          $scope.deck[cardIndex]['img'] = response.data[0]['img'];
+        }
+      });
     };
 
     $scope.addToDeck = function() {
-      if (!$scope.selectedItem) {
+      if (!$scope.selectedCard) {
         return;
       }
 
-      var card =  $scope.selectedItem.value
+      var card =  $scope.selectedCard.value
       var cardIndex = getCardIndex(card);
 
       if (cardIndex !== -1) {
-        $scope.deck[cardIndex]['card-count'] += 1;
+        $scope.deck[cardIndex]['card_count'] += 1;
       } else {
         $scope.deck.push({
-          'card-name': card,
-          'card-count': 1,
+          'card_name': card,
+          'card_count': 1,
           'img': 'card-back-default.png'
         });
 
         loadImage(card);
       }
 
-      $scope.searchText = '';
+      $scope.searchCardText = '';
       updateClassifier();
     };
 
     $scope.removeFromDeck = function(card) {
-      cardIndex = getCardIndex(card['card-name']);
+      cardIndex = getCardIndex(card['card_name']);
       if (cardIndex === -1) {
         return;
       }
 
-      $scope.deck[cardIndex]['card-count']--;
-      if ($scope.deck[cardIndex]['card-count'] <= 0) {
+      $scope.deck[cardIndex]['card_count']--;
+      if ($scope.deck[cardIndex]['card_count'] <= 0) {
         $scope.deck.splice(cardIndex, 1);
       }
 
       updateClassifier();
     };
 
-    $scope.displayedRows = [];
+    $scope.displayedDeck = [];
     $scope.deck = [];
-    $scope.heroClass = 'Rogue';
   }]);

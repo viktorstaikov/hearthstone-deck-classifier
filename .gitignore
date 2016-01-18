@@ -298,3 +298,9 @@ _Pvt_Extensions
 
 # Vim swap files
 **/.*.swp
+
+# Ignore bower components
+**/bower_components
+
+# Ignore random OS X file
+**/.DS_Store
