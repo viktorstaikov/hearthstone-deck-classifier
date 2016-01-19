@@ -63,7 +63,7 @@ def deck_classify():
     hero_class = data["hero_class"]
     deck = data["deck"]
     K = 3
-    if "neares" in data:
+    if "nearest" in data:
         try:
             K = int(data["nearest"])
         except ValueError:

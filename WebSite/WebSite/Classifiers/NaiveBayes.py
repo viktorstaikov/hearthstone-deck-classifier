@@ -18,25 +18,27 @@
         # the number of cards is proportional on the number of decks
         probability = 1.0
         probability *= self.cards[hero_class][archetype]["total"] / self.cards[hero_class]["total"]
-
+        cards_into_account = 0.0
+        total_cards = 0.0
         for card in deck:
             card_name = card['card_name']
             card_count = int(card['card_count'])
 
-            if not card_name in self.cards[hero_class][archetype]:
-                return 0
+            total_cards += 1
 
-            # numerator 
-            card_type_prob = self.cards[hero_class][archetype][card_name] / self.cards[hero_class][archetype]["total"]
-            # denominator
-            card_prob = self.all_cards[card_name] / self.total_cards
+            if card_name in self.cards[hero_class][archetype]:
+                # numerator 
+                card_type_prob = self.cards[hero_class][archetype][card_name] / self.cards[hero_class][archetype]["total"]
+                # denominator
+                card_prob = self.all_cards[card_name] / self.total_cards
 
-            if card_type_prob == 0 or card_prob == 0:
-                return 0
+                if not (card_type_prob == 0 and card_prob == 0):
+                    cards_into_account += 1
+                    probability *= (card_type_prob * card_count / card_prob)
 
-            probability *= (card_type_prob * card_count / card_prob)
+            
                 
-
+        probability *= cards_into_account / total_cards
         return probability
 
     def add_card(self, card):
