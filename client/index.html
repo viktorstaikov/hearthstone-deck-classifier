@@ -43,7 +43,8 @@
               md-selected-item="heroClass" 
               md-search-text="searchHeroClassText" 
               md-items="item in getHeroClassSuggestions()" 
-              md-item-text="item.display">
+              md-item-text="item.display"
+              md-selected-item-change="selectHeroClass()">
          
               <md-item-template>
                 <span md-highlight-text="searchHeroClassText">{{item.display}}</span>
@@ -77,60 +78,87 @@
         </div>
 
         <br/>
-        <div ng-if="deck.length != 0">
-          <h2>Deck cards</h2>
-          <table st-table="displayedDeck" st-safe-src="deck" class="table table-striped">
-            <thead>
-              <tr>
-                <th>Card name</th>
-                <th>Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="card in deck">
-                <td>{{card['card_name']}}</td>
-                <td>{{card['card_count']}}</td>
-                <td>
-                  <img ng-src="{{card['img']}}" alt="Card image" class="card-img">
-                </td>
-                <td>
-                  <button type="button" ng-click="removeFromDeck(card)" class="btn btn-sm btn-danger">
-                    <i class="glyphicon glyphicon-remove-circle"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <br/>
-
-          <h2>Classification</h2>
-          <br/>
-
-          <div class="row">
-            <div class="form-group col-md-8">
-              <table st-table="displayedNearest" st-safe-src="nearest" class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Cards match</th>
-                    <th>Archetype</th>
-                    <th>Deck name</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="deck in nearest">
-                    <td>{{deck['cards_match']}}</td>
-                    <td>{{deck['archetype']}}</td>
-                    <td>{{deck['title']}}</td>
-                  </tr>
-                </tbody>
-              </table>
+        <div class="row" ng-if="deck.length != 0">
+          <div class="col-md-6">
+            <h2>Deck cards</h2>
+            <table st-table="displayedDeck" st-safe-src="deck" class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Card name</th>
+                  <th>Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="card in deck">
+                  <td>{{card['card_name']}}</td>
+                  <td>{{card['card_count']}}</td>
+                  <td>
+                    <img ng-src="{{card['img']}}" alt="Card image" class="card-img">
+                  </td>
+                  <td>
+                    <button type="button" ng-click="removeFromDeck(card)" class="btn btn-sm btn-danger">
+                      <i class="glyphicon glyphicon-remove-circle"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             </div>
-            <div class="form-group col-md-4">
-              <canvas id="pie" 
-                class="chart chart-pie" 
-                chart-data="archetypePercent" 
-                chart-labels="archetypeNames">
-              </canvas> 
+            <div class="col-md-6" ng-show=false>
+              <h2>Left to play {{previewDeck}}</h2>
+              <table st-table="displayedPreviewDeck" st-safe-src="previewDeckCards" class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Card name</th>
+                  <th>Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="card in previewDeckCards">
+                  <td>{{card['card_name']}}</td>
+                  <td>{{card['card_count']}}</td>
+                  <td>
+                    <button type="button" ng-click="markAsPlayed(card)" class="btn btn-sm btn-danger">
+                      <i class="glyphicon glyphicon-remove-circle"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+          <br/>
+          
+          <div ng-if="deck.length != 0">
+            <h2>Classification</h2>
+            <br/>
+
+            <div class="row">
+              <div class="form-group col-md-8">
+                <table st-table="displayedNearest" st-safe-src="nearest" class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Cards match</th>
+                      <th>Archetype</th>
+                      <th>Deck name</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="deck in nearest">
+                      <td>{{deck['cards_match']}}</td>
+                      <td>{{deck['archetype']}}</td>
+                      <td>{{deck['title']}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="form-group col-md-4">
+                <canvas id="pie" 
+                  class="chart chart-pie" 
+                  chart-data="archetypePercent" 
+                  chart-labels="archetypeNames">
+                </canvas> 
+              </div>
             </div>
           </div>
         </div>

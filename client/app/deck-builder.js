@@ -1,5 +1,16 @@
 var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', 'chart.js'])
   .controller('DeckController', ['$scope', '$http', function($scope, $http) {
+    // Utility
+   var getCardIndex = function(cardName, deck) {
+      for (i in deck) {
+        if (deck[i]['card_name'] === cardName) {
+          return i;
+        }
+      }
+
+      return -1;
+    };
+
     // Chart
     $scope.archetypeNames = [];
     $scope.archetypePercent = [];
@@ -33,6 +44,30 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
       }
     };
 
+    // Lefto to play section
+    $scope.previewDeck = '';
+    $scope.displayedPreviewDeck = [];
+    $scope.previewDeckCards = [];
+    var initDeckPreview = function(deck) {
+      $scope.previewDeck = deck[0].title;
+      $scope.previewDeckCards.splice(0, $scope.previewDeckCards.length);
+
+      for (i in deck) {
+        var cardIndex = getCardIndex(deck[i].card_name, $scope.deck);
+        var cardCount = 0;
+        if (cardIndex == -1) {
+          cardCount = deck[i].card_count
+        } else {
+          cardCount = $scope.deck[cardIndex]['card_count'] - deck[i]['card_count'];
+        }
+
+        $scope.previewDeckCards.push({
+          card_name: deck[i].card_name,
+          card_count: cardCount
+        });
+      }
+    }
+
     // Classification
     var classifyApiBaseUrl = 'https://viktorstaikov.pythonanywhere.com/api';
 
@@ -47,18 +82,8 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
       }).then(function success(response) {
         initChart(response.data['archetypes']);
         initDecksTable(response.data['nearest']);
+        initDeckPreview(response.data['nearest'][0][1]['deck']);
       });
-    };
-
-    // Utility
-   var getCardIndex = function(cardName) {
-      for (i in $scope.deck) {
-        if ($scope.deck[i]['card_name'] === cardName) {
-          return i;
-        }
-      }
-
-      return -1;
     };
 
     // Autocomplete add card
@@ -108,6 +133,10 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
       'Warrior'
     ];
 
+    $scope.selectHeroClass = function() {
+      $scope.deck.splice(0, $scope.deck.splice.length);
+    };
+
     $scope.getHeroClassSuggestions = function () {
       var prefix = $scope.searchHeroClassText.toLowerCase();
       var suggestions = [];
@@ -130,7 +159,7 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
         url: hearthstoneApiBaseUrl + '/cards/' + card,
         headers: hearthstoneApiHeaders
       }).then(function success(response) {
-        var cardIndex = getCardIndex(card);
+        var cardIndex = getCardIndex(card, $scope.deck);
         if (cardIndex != -1) {
           $scope.deck[cardIndex]['img'] = response.data[0]['img'];
         }
@@ -143,7 +172,7 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
       }
 
       var card =  $scope.selectedCard.value
-      var cardIndex = getCardIndex(card);
+      var cardIndex = getCardIndex(card, $scope.deck);
 
       if (cardIndex !== -1) {
         $scope.deck[cardIndex]['card_count'] += 1;
@@ -162,7 +191,7 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
     };
 
     $scope.removeFromDeck = function(card) {
-      cardIndex = getCardIndex(card['card_name']);
+      cardIndex = getCardIndex(card['card_name'], $scope.deck);
       if (cardIndex === -1) {
         return;
       }
