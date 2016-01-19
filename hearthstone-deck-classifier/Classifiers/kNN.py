@@ -39,6 +39,9 @@ class KNearestDecks(object):
                 deck_id = archetype_id + '##' + deck_title
                 dist = self.__get_distance(deck_id, cards)
 
+                if dist == KNearestDecks.MAX_CARDS_IN_DECK:
+                    continue
+
                 is_complete_match = KNearestDecks.MAX_CARDS_IN_DECK - dist == input_card_count
                 heappush(dist_sorted_decks, (dist, {
                     'deck': deck,
