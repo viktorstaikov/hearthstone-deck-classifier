@@ -62,6 +62,12 @@ def deck_classify():
     data = request.get_json()
     hero_class = data["hero_class"]
     deck = data["deck"]
+    K = 3
+    if "neares" in data:
+        try:
+            K = int(data["nearest"])
+        except ValueError:
+            K = 3
 
     archetypes = naive_bayes.classify(hero_class, deck)
     print(repr(archetypes))
@@ -76,7 +82,7 @@ def deck_classify():
             sum+= (0-prob)
             top_archetypes.append(archetype)
             
-    nearest = k_neighbours.get_nearest_decks(3, hero_class, top_archetypes, deck)
+    nearest = k_neighbours.get_nearest_decks(K, hero_class, top_archetypes, deck)
 
     has_match = False
     for dist, near_entry in nearest:
