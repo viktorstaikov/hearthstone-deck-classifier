@@ -196,20 +196,24 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
       $scope.previewDeckCards = [];
 
       for (i in deck) {
-        var cardName = String(deck[i]['card_name']);
+        var cardName = deck[i]['card_name'];
+        var countInDeck = deck[i]['card_count'];
 
-        var cardIndex = getCardIndex(deck[i]['card_name'], $scope.deck);
-        var cardCount = 0;
+        var cardIndex = getCardIndex(cardName, $scope.deck);
+        var remainingCount = 0;
         if (cardIndex == -1) {
-          cardCount = deck[i].card_count
+          remainingCount = countInDeck;
         } else {
-          cardCount = $scope.deck[cardIndex]['card_count'] - deck[i]['card_count'];
+          remainingCount = countInDeck - $scope.deck[cardIndex]['card_count'];
         }
 
-        $scope.previewDeckCards.push({
-          card_name: cardName,
-          card_count: cardCount
-        });
+        if (remainingCount > 0) {
+          $scope.previewDeckCards.push({
+            card_name: cardName,
+            card_count: countInDeck,
+            remaining_count: remainingCount
+          });
+        }
       }
     };
 

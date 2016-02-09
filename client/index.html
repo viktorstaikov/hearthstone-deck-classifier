@@ -80,7 +80,7 @@
         <br/>
         <div class="row" ng-if="deck.length != 0">
           <div class="col-md-6">
-            <h2>Deck cards</h2>
+            <h2>Played cards</h2>
             <table st-table="displayedDeck" st-safe-src="deck" class="table table-striped">
               <thead>
                 <tr>
@@ -105,18 +105,20 @@
             </table>
             </div>
             <div class="col-md-6">
-              <h2>Left to play {{previewDeck}}</h2>
+              <h2>{{previewDeck}}</h2>
               <table st-table="displayedPreviewDeck" st-safe-src="previewDeckCards" class="table table-striped">
               <thead>
                 <tr>
                   <th>Card name</th>
                   <th>Count</th>
+                  <th>Remaining</th>
                 </tr>
               </thead>
               <tbody>
                 <tr ng-repeat="card in previewDeckCards">
                   <td>{{card['card_name']}}</td>
                   <td>{{card['card_count']}}</td>
+                  <td>{{card['remaining_count']}}</td>
                   <td>
                     <button type="button" ng-click="markAsPlayed(card)" class="btn btn-sm btn-primary">
                       Mark as played
