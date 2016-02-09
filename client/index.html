@@ -97,7 +97,7 @@
                   </td>
                   <td>
                     <button type="button" ng-click="removeFromDeck(card)" class="btn btn-sm btn-danger">
-                      <i class="glyphicon glyphicon-remove-circle"></i>
+                      Mark as not played
                     </button>
                   </td>
                 </tr>
@@ -118,8 +118,8 @@
                   <td>{{card['card_name']}}</td>
                   <td>{{card['card_count']}}</td>
                   <td>
-                    <button type="button" ng-click="markAsPlayed(card)" class="btn btn-sm btn-danger">
-                      <i class="glyphicon glyphicon-remove-circle"></i>
+                    <button type="button" ng-click="markAsPlayed(card)" class="btn btn-sm btn-primary">
+                      Mark as played
                     </button>
                   </td>
                 </tr>

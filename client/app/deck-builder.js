@@ -44,33 +44,6 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
       }
     };
 
-    // Lefto to play section
-    $scope.previewDeck = '';
-    $scope.displayedPreviewDeck = [];
-    $scope.previewDeckCards = [];
-    var initDeckPreview = function(deck) {
-      $scope.previewDeck = deck[0].title;
-      $scope.previewDeckCards = [];
-      console.log($scope.previewDeckCards);
-
-      for (i in deck) {
-        var cardName = String(deck[i]['card_name']);
-
-        var cardIndex = getCardIndex(deck[i]['card_name'], $scope.deck);
-        var cardCount = 0;
-        if (cardIndex == -1) {
-          cardCount = deck[i].card_count
-        } else {
-          cardCount = $scope.deck[cardIndex]['card_count'] - deck[i]['card_count'];
-        }
-
-        $scope.previewDeckCards.push({
-          card_name: cardName,
-          card_count: cardCount
-        });
-      }
-    }
-
     // Classification
     var classifyApiBaseUrl = 'https://viktorstaikov.pythonanywhere.com/api';
 
@@ -169,28 +142,32 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
       });
     };
 
-    $scope.addToDeck = function() {
-      if (!$scope.selectedCard) {
-        return;
-      }
-
-      var card =  $scope.selectedCard.value
-      var cardIndex = getCardIndex(card, $scope.deck);
+    var addCardToDeck = function(card) {
+      var cardName =  card.value
+      var cardIndex = getCardIndex(cardName, $scope.deck);
 
       if (cardIndex !== -1) {
         $scope.deck[cardIndex]['card_count'] += 1;
       } else {
         $scope.deck.push({
-          'card_name': card,
+          'card_name': cardName,
           'card_count': 1,
           'img': 'card-back-default.png'
         });
 
-        loadImage(card);
+        loadImage(cardName);
       }
 
-      $scope.searchCardText = '';
       updateClassifier();
+    }
+
+    $scope.addToDeck = function() {
+      if (!$scope.selectedCard) {
+        return;
+      }
+
+      addCardToDeck($scope.selectedCard);
+      $scope.searchCardText = '';
     };
 
     $scope.removeFromDeck = function(card) {
@@ -209,4 +186,35 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
 
     $scope.displayedDeck = [];
     $scope.deck = [];
+
+    // Left to play section
+    $scope.previewDeck = '';
+    $scope.displayedPreviewDeck = [];
+    $scope.previewDeckCards = [];
+    var initDeckPreview = function(deck) {
+      $scope.previewDeck = deck[0].title;
+      $scope.previewDeckCards = [];
+
+      for (i in deck) {
+        var cardName = String(deck[i]['card_name']);
+
+        var cardIndex = getCardIndex(deck[i]['card_name'], $scope.deck);
+        var cardCount = 0;
+        if (cardIndex == -1) {
+          cardCount = deck[i].card_count
+        } else {
+          cardCount = $scope.deck[cardIndex]['card_count'] - deck[i]['card_count'];
+        }
+
+        $scope.previewDeckCards.push({
+          card_name: cardName,
+          card_count: cardCount
+        });
+      }
+    };
+
+    $scope.markAsPlayed = function(card) {
+      console.log(card);
+      addCardToDeck({value: card.card_name});
+    };
   }]);
