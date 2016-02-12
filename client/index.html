@@ -149,7 +149,7 @@
                     <tr ng-repeat="deck in nearest">
                       <td>{{deck['cards_match']}}</td>
                       <td>{{deck['archetype']}}</td>
-                      <td>{{deck['title']}}</td>
+                      <td><a ng-click="changeDeckPreview(deck)">{{deck['title']}}</a></td>
                     </tr>
                   </tbody>
                 </table>

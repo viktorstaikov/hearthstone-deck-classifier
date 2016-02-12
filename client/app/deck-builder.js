@@ -46,6 +46,7 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
 
     // Classification
     var classifyApiBaseUrl = 'https://viktorstaikov.pythonanywhere.com/api';
+    $scope.nearestDecks = {};
 
     var updateClassifier = function() {
       $http({
@@ -59,6 +60,12 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
         initChart(response.data['archetypes']);
         initDecksTable(response.data['nearest']);
         initDeckPreview(response.data['nearest'][0][1]['deck']);
+
+        for (i in response.data['nearest']) {
+          var deck = response.data['nearest'][i][1]['deck'];
+          var deckName = response.data['nearest'][i][1]['deck'][0]['title'];
+          $scope.nearestDecks[deckName] = deck;
+        }
       });
     };
 
@@ -191,6 +198,7 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
     $scope.previewDeck = '';
     $scope.displayedPreviewDeck = [];
     $scope.previewDeckCards = [];
+
     var initDeckPreview = function(deck) {
       $scope.previewDeck = deck[0].title;
       $scope.previewDeckCards = [];
@@ -214,6 +222,13 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
             remaining_count: remainingCount
           });
         }
+      }
+    };
+
+    $scope.changeDeckPreview = function(selected) {
+      var deck = $scope.nearestDecks[selected['title']];
+      if (deck) {
+        initDeckPreview(deck);
       }
     };
 
