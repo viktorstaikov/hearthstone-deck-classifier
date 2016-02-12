@@ -241,8 +241,6 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
     };
 
     var previewCardPopup = function(card, image) {
-      console.log(card);
-      console.log(image);
       ngDialog.open({
         template: '<div class="text-center ngdialog-theme-default"><h2>' + card
         + '</h2><br/><img src="' + image + '"></div>',
