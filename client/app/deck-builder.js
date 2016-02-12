@@ -1,5 +1,5 @@
-var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', 'chart.js'])
-  .controller('DeckController', ['$scope', '$http', function($scope, $http) {
+var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', 'chart.js', 'ngDialog'])
+  .controller('DeckController', ['$scope', '$http', 'ngDialog', function($scope, $http, ngDialog) {
     // Utility
    var getCardIndex = function(cardName, deck) {
       for (i in deck) {
@@ -136,17 +136,21 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
     };
 
     // Deck view
-    var loadImage = function(card) {
+    var loadImage = function(card, callback) {
       $http({
         method: 'GET',
         url: hearthstoneApiBaseUrl + '/cards/' + card,
         headers: hearthstoneApiHeaders
       }).then(function success(response) {
-        var cardIndex = getCardIndex(card, $scope.deck);
-        if (cardIndex != -1) {
-          $scope.deck[cardIndex]['img'] = response.data[0]['img'];
-        }
+        callback(card, response.data[0]['img']);
       });
+    };
+
+    var addTableImage = function(card, image) {
+      var cardIndex = getCardIndex(card, $scope.deck);
+      if (cardIndex != -1) {
+        $scope.deck[cardIndex]['img'] = image;
+      }
     };
 
     var addCardToDeck = function(card) {
@@ -162,7 +166,7 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
           'img': 'card-back-default.png'
         });
 
-        loadImage(cardName);
+        loadImage(cardName, addTableImage);
       }
 
       updateClassifier();
@@ -233,7 +237,19 @@ var deckBuilder = angular.module('deck-builder', ['ngMaterial', 'smart-table', '
     };
 
     $scope.markAsPlayed = function(card) {
-      console.log(card);
       addCardToDeck({value: card.card_name});
+    };
+
+    var previewCardPopup = function(card, image) {
+      console.log(card);
+      console.log(image);
+      ngDialog.open({
+        template: '<div class="text-center ngdialog-theme-default"><h2>' + card + '</h2><br/><img src="' + image + '"></div>',
+        plain: true
+      });
+    };
+
+    $scope.showCard = function(card) {
+      loadImage(card.card_name, previewCardPopup);
     };
   }]);

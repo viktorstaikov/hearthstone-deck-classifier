@@ -15,6 +15,7 @@
     <!-- Popups -->
     <script type="text/javascript" src="bower_components/ng-dialog/js/ngDialog.min.js"></script>
     <link rel="stylesheet" href="bower_components/ng-dialog/css/ngDialog.css">
+    <link rel="stylesheet" href="bower_components/ng-dialog/css/ngDialog-theme-default.min.css">
 
     <!-- Table view -->
     <script type="text/javascript" src="bower_components/angular-smart-table/dist/smart-table.js"></script>
@@ -120,7 +121,7 @@
               </thead>
               <tbody>
                 <tr ng-repeat="card in previewDeckCards">
-                  <td>{{card['card_name']}}</td>
+                  <td><a ng-click="showCard(card)">{{card['card_name']}}</a></td>
                   <td>{{card['card_count']}}</td>
                   <td>{{card['remaining_count']}}</td>
                   <td>
